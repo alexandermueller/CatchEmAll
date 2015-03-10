@@ -24,8 +24,8 @@ for i in range(152):
         
         if i == j:
             name = pokemon[i]
-        else:
-            name = "%s%s" % (prefixes[j], postfixes[i]) # The link is backwards from the way the names are made, including how the fusion works
+        else: # The link is backwards from the way the names are made, same for fusions
+            name = "%s%s" % (prefixes[j], postfixes[i]) 
 
         print "(%03d,%03d) %s" % (i, j, name)
 
