@@ -1,13 +1,15 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
+import os
 from PIL import Image, ImageDraw, ImageFont
+
+MERGED_DIR = './Merged Poster'
 
 # Pokemon Count is at most 152.
 pokemonCount = 152
 stdW, stdH = (240, 240)
 W, H = (300, 300)
 finalW, finalH = (W * (pokemonCount + 1), H * (pokemonCount + 1))
-deltaX, deltaY = (15, 10)
 fontSize = 30
 pokemon = ["Bulbasaur","Ivysaur","Venusaur","Charmander","Charmeleon","Charizard","Squirtle","Wartortle","Blastoise","Caterpie","Metapod","Butterfree","Weedle","Kakuna","Beedrill","Pidgey","Pidgeotto","Pidgeot","Rattata","Raticate","Spearow","Fearow","Ekans","Arbok","Pikachu","Raichu","Sandshrew","Sandslash","Nidoran(f)","Nidorina","Nidoqueen","Nidoran(m)","Nidorino","Nidoking","Clefairy","Clefable","Vulpix","Ninetales","Jigglypuff","Wigglytuff","Zubat","Golbat","Oddish","Gloom","Vileplume","Paras","Parasect","Venonat","Venomoth","Diglett","Dugtrio","Meowth","Persian","Psyduck","Golduck","Mankey","Primeape","Growlithe","Arcanine","Poliwag","Poliwhirl","Poliwrath","Abra","Kadabra","Alakazam","Machop","Machoke","Machamp","Bellsprout","Weepinbell","Victreebel","Tentacool","Tentacruel","Geodude","Graveler","Golem","Ponyta","Rapidash","Slowpoke","Slowbro","Magnemite","Magneton","Farfetchd","Doduo","Dodrio","Seel","Dewgong","Grimer","Muk","Shellder","Cloyster","Gastly","Haunter","Gengar","Onix","Drowzee","Hypno","Krabby","Kingler","Voltorb","Electrode","Exeggcute","Exeggutor","Cubone","Marowak","Hitmonlee","Hitmonchan","Lickitung","Koffing","Weezing","Rhyhorn","Rhydon","Chansey","Tangela","Kangaskhan","Horsea","Seadra","Goldeen","Seaking","Staryu","Starmie","Mr. Mime","Scyther","Jynx","Electabuzz","Magmar","Pinsir","Tauros","Magikarp","Gyarados","Lapras","Ditto","Eevee","Vaporeon","Jolteon","Flareon","Porygon","Omanyte","Omastar","Kabuto","Kabutops","Aerodactyl","Snorlax","Articuno","Zapdos","Moltres","Dratini","Dragonair","Dragonite","Mewtwo","Mew","Missingno."]
 prefixes = ["Bulb","Ivy","Venu","Char","Char","Char","Squirt","War","Blast","Cater","Meta","Butter","Wee","Kak","Bee","Pid","Pidg","Pidg","Rat","Rat","Spear","Fear","Ek","Arb","Pika","Rai","Sand","Sand","Nido","Nido","Nido","Nido","Nido","Nido","Clef","Clef","Vul","Nine","Jiggly","Wiggly","Zu","Gol","Odd","Gloo","Vile","Pa","Para","Veno","Veno","Dig","Dug","Meow","Per","Psy","Gol","Man","Prime","Grow","Arca","Poli","Poli","Poli","Ab","Kada","Ala","Ma","Ma","Ma","Bell","Weepin","Victree","Tenta","Tenta","Geo","Grav","Gol","Pony","Rapi","Slow","Slow","Magne","Magne","Far","Do","Do","See","Dew","Gri","Mu","Shell","Cloy","Gas","Haunt","Gen","On","Drow","Hyp","Krab","King","Volt","Electr","Exegg","Exegg","Cu","Maro","Hitmon","Hitmon","Licki","Koff","Wee","Rhy","Rhy","Chan","Tang","Kangas","Hors","Sea","Gold","Sea","Star","Star","Mr.","Scy","Jyn","Electa","Mag","Pin","Tau","Magi","Gyara","Lap","Dit","Ee","Vapor","Jolt","Flare","Pory","Oma","Oma","Kabu","Kabu","Aero","Snor","Artic","Zap","Molt","Dra","Dragon","Dragon","Mew","Mew","Miss"]
@@ -20,8 +22,11 @@ draw = ImageDraw.Draw(final)
 
 pokemonCount = 152 if pokemonCount > 152 or pokemonCount < 0 else pokemonCount
 
-for i in xrange(0, pokemonCount + 1):
-    for j in xrange(0, pokemonCount + 1):
+if not os.path.exists(MERGED_DIR):
+    os.makedirs(MERGED_DIR)
+
+for i in range(pokemonCount + 1):
+    for j in range(pokemonCount + 1):
         if not (i == j == 0):
             pokeName = ""
             fileName = ""
@@ -44,19 +49,22 @@ for i in xrange(0, pokemonCount + 1):
                 face = j
                 text = pokeName = "%s%s" % (prefixes[j - 1], postfixes[i - 1])
 
-            print "Adding: (%03d,%03d)[%s].png" % (body, face, pokeName)
-            filename = "./pokemon/(%03d,%03d)[%s].png" % (body, face, pokeName)
+            print("Adding: (%03d,%03d)[%s].png" % (body, face, pokeName))
+            filename = "./Assets/Sprites/(%03d,%03d)[%s].png" % (body, face, pokeName)
             current = Image.open(filename).convert("RGBA")
 
             x, y = (W * i, H * j)
-            final.paste(background, (x, y, x + 300, y + 300))
-            final.paste(current, (x + deltaX, y + deltaY, x + deltaX + stdW, y + deltaY + stdH), current)
+            width, height = current.size
+            deltaX, deltaY = (round((W - width) / 2), round((H - height) / 2))
+            
+            final.paste(background, (x, y, x + W, y + H))
+            final.paste(current, (x + deltaX, y + deltaY, x + deltaX + width, y + deltaY + height), current)
                                
             w, h = draw.textsize(text, font=font)
             draw.text((x + (W - w)/2, y + (H - 33)), text, fill=(red,0,0,255), font=font)
 
 origin = Image.open("./Assets/origin.png").convert("RGBA")
 final.paste(origin, (0, 0, 340, 340))
-print "Saving..."
-final.save('Merged Poster/PokeFusionsPoster.png')
-print "Finished!"
+print("Saving...")
+final.save('%s/PokeFusionsPoster(%ix%i).png' % (MERGED_DIR, pokemonCount, pokemonCount))
+print("Finished!")
