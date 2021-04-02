@@ -42,7 +42,6 @@ def main(argc, argv):
 
     for i in range(columns + 1):
         for j in range(rows + 1):
-            printProgressBar(i * j + j, columns * rows)
             x, y = (i * SPRITE_WIDTH, j * SPRITE_HEIGHT)
             final.paste(background, (x, y, x + SPRITE_WIDTH, y + SPRITE_HEIGHT))
 
