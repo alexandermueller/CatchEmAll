@@ -5,11 +5,13 @@ import os
 import sys
 from Constants import *
 from PIL import Image, ImageDraw, ImageFont
-
+    
 def clamp(minVal, val, maxVal):
     return max(minVal, min(val, maxVal))
 
 def main(argc, argv):
+    print("Preparing poster file...")
+    
     font = ImageFont.truetype(FONT_TYPE, FONT_SIZE)
     rows = MAX_POKEMON_COUNT
     columns = MAX_POKEMON_COUNT
@@ -32,13 +34,15 @@ def main(argc, argv):
     if not os.path.exists(MERGED_DIR):
         os.makedirs(MERGED_DIR)
 
+    # Draw background first
+    print("Adding background...")
+    
     origin = Image.open("./Assets/origin.png").convert("RGBA")
     final.paste(origin, (0, 0, 340, 340))
 
-    # Draw background first
-
     for i in range(columns + 1):
         for j in range(rows + 1):
+            printProgressBar(i * j + j, columns * rows)
             x, y = (i * SPRITE_WIDTH, j * SPRITE_HEIGHT)
             final.paste(background, (x, y, x + SPRITE_WIDTH, y + SPRITE_HEIGHT))
 
@@ -55,10 +59,12 @@ def main(argc, argv):
     final.paste(origin, (0, 0, 340, 340))
     
     # Draw sprites and text
+    
+    maxLineLength = 0
 
-    for i in reversed(range(startColumn, min(startColumn + columns, MAX_POKEMON_COUNT) + 1)):
-        for j in reversed(range(startRow, min(startRow + rows, MAX_POKEMON_COUNT) + 1)):
-            if not (i == j == 0 or (i == startColumn and j == startRow)):
+    for i in range(startColumn, min(startColumn + columns, MAX_POKEMON_COUNT) + 1):
+        for j in range(startRow, min(startRow + rows, MAX_POKEMON_COUNT) + 1):
+            if not (i == startColumn and j == startRow):
                 pokeName = ""
                 fileName = ""
                 body = 0
@@ -81,7 +87,8 @@ def main(argc, argv):
                     face = j
                     text = pokeName = "%s%s" % (PREFIXES[j - 1], SUFFIXES[i - 1])
 
-                print("Adding: (%03d,%03d)[%s].png" % (body, face, pokeName))
+                print("Adding Sprite: (%03d,%03d)[%s].png" % (body, face, pokeName))
+
                 filename = "./Assets/Sprites/(%03d,%03d)[%s].png" % (body, face, pokeName)
                 current = Image.open(filename).convert("RGBA")
 
@@ -103,7 +110,7 @@ def main(argc, argv):
     x, y = ((finalW - w) / 2, finalH - h - delta)
     draw.text((x, y), credits, fill=(150, 150, 150, 255), font=f)
 
-    print("Saving...")
+    print("Saving...", flush=True)
     final.save('%s/PokeFusionsPoster(%ix%i)[rowStart=%s, columnStart=%s].png' % (MERGED_DIR, columns, rows, POKEMON[startRow], POKEMON[startColumn]))
     print("Finished!")
 
